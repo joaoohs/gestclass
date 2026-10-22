@@ -1,32 +1,82 @@
 # GestClass
 
-Sistema web para registrar e organizar abonos, TREs e atestados dos professores da Escola Classe 2.
-React + Vite + Firebase (Authentication e Firestore). Hospedagem: GitHub Pages.
+Sistema web para registrar e organizar os **abonos, TREs e atestados dos professores** da Escola Classe 2, escola pública de educação infantil do Distrito Federal.
 
-## 1. Rodar localmente
+Projeto de extensão da disciplina *Extensão: Cooperação, Humanismo Solidário, Redes e Comunidades*, do curso de Engenharia de Software da Universidade Católica de Brasília (UCB).
+
+## O problema
+
+Na Escola Classe 2, os registros de abonos, TREs e atestados dos professores ficam espalhados em papéis e planilhas soltas. Isso dificulta a consulta pela direção e o apoio aos processos oficiais junto à SEEDF. A demanda partiu da própria direção da escola.
+
+## A solução
+
+O GestClass reúne esses registros em um só lugar, com acesso restrito à direção e à secretaria. O foco é a **organização interna**: o sistema não tem fluxo de aprovação e não substitui nenhum processo oficial da escola.
+
+### Funcionalidades
+
+- **Lançamentos:** lista de abonos, TREs e atestados, com filtros por professor, mês e tipo.
+- **Novo lançamento:** cadastro com professor, tipo, período, protocolo, observação e indicação de documento entregue.
+- **Relatórios:** resumo por professor, com exportação em planilha (CSV) e impressão ou salvamento em PDF.
+- **Login:** acesso por e-mail e senha, liberado apenas para usuários autorizados.
+
+### Fora do escopo desta versão
+
+- Anexo digital do documento (o campo já está reservado no modelo de dados).
+- Cadastro próprio de professores.
+- Fluxo de aprovação dos pedidos.
+
+## Cuidados com os dados (LGPD)
+
+Atestados médicos são dados sensíveis, e por isso o sistema segue estes princípios:
+
+- **Acesso restrito:** apenas usuários autorizados leem ou gravam dados, o que é garantido pelas regras de segurança do Firestore (`firestore.rules`).
+- **Coleta mínima:** o sistema não pede diagnóstico nem CID.
+- **Sem dados reais no repositório:** nenhuma informação de professores deve ser enviada ao GitHub.
+
+## Tecnologias
+
+- React com Vite
+- Firebase Authentication e Cloud Firestore (plano gratuito)
+- GitHub Pages para publicação
+
+## Como rodar localmente
+
+Requisitos: Node.js 20 ou mais novo.
+
 ```bash
 npm install
-cp .env.example .env   # preencha com os dados do app web do Firebase
 npm run dev
 ```
 
-## 2. Configurar o Firebase (plano gratuito Spark)
-1. Console do Firebase > criar projeto > adicionar app **Web** e copiar as chaves para o `.env`.
-2. **Authentication** > ativar "E-mail/senha" > criar os usuários da direção e da secretaria.
-3. **Firestore Database** > criar banco na região **southamerica-east1 (São Paulo)**.
-4. Colar o conteúdo de `firestore.rules` em Firestore > Regras > Publicar.
-5. Para autorizar um usuário: em Firestore, criar o documento `usuarios/{UID do usuário}` (pode ter o campo `papel: "direcao"`). Sem esse documento, o usuário entra mas não lê nem grava dados.
+Crie um arquivo `.env` na raiz do projeto com as chaves do app web do Firebase (Configurações do projeto no console do Firebase):
 
-## 3. Publicar no GitHub Pages
-1. Repositório > Settings > Pages > Source: **GitHub Actions**.
-2. Settings > Secrets and variables > Actions: criar os secrets `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`.
-3. Firebase > Authentication > Configurações > Domínios autorizados: adicionar `SEU-USUARIO.github.io`.
-4. A cada push na branch `main`, o workflow publica o site.
+```
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_APP_ID=
+```
 
-## Modelo de dados (Firestore)
-- `lancamentos/{id}`: `professorNome`, `tipo` (abono | tre | atestado), `dataInicio`, `dataFim`, `observacao`, `documentoEntregue`, `protocolo`, `anexo` (reservado, nulo por enquanto), `criadoEm`, `criadoPor`.
+Para usar o sistema, é preciso:
+
+1. Ativar **Authentication** com o provedor e-mail/senha e criar os usuários.
+2. Criar o banco **Firestore** (região `southamerica-east1`) e publicar as regras do arquivo `firestore.rules`.
+3. Liberar cada usuário criando um documento em `usuarios/{UID do usuário}`.
+
+## Modelo de dados
+
+- `lancamentos/{id}`: `professorNome`, `tipo` (abono, tre ou atestado), `dataInicio`, `dataFim`, `observacao`, `documentoEntregue`, `protocolo`, `anexo` (reservado), `criadoEm`, `criadoPor`.
 - `usuarios/{uid}`: libera o acesso ao sistema.
 
-## Cuidados (LGPD)
-- Não registrar diagnóstico ou CID. Nunca subir dados reais ao repositório.
-- Testar as regras do Firestore antes de usar dados reais (aba "Regras" > Simulador).
+## Metodologia
+
+O projeto combina Pesquisa-Ação, com a participação da direção da escola em todas as etapas, e desenvolvimento ágil: o protótipo é apresentado à direção, validado e ajustado ao longo do semestre. Ao final, a escola recebe o sistema em funcionamento, um manual de uso simples e o código aberto neste repositório, para que o projeto possa ser mantido e continuado.
+
+## Equipe
+
+- Leonardo Esquivel Couto
+- Hugo Ferreira Vasconcelos
+- Leonardo Gomes da Silva Nunes
+- João Vitor Higino Silva
+
+Engenharia de Software, Universidade Católica de Brasília.
