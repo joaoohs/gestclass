@@ -1,0 +1,31 @@
+*{box-sizing:border-box}body{margin:0}
+.app{display:flex;min-height:100vh;background:#F6F7F4;color:#1F2A33;font-family:"Nunito Sans",system-ui,sans-serif}
+.side{width:240px;flex:none;background:#1F2A33;color:#E8EEEC;padding:28px 20px;display:flex;flex-direction:column;gap:6px}
+.logo{font-size:24px;font-weight:800}.school{font-size:13px;color:#A9B8B4;margin-bottom:28px}
+.nav{display:block;padding:11px 14px;border-radius:8px;font-size:15px;color:#C9D6D2;text-decoration:none;background:none;border:0;text-align:left;font-family:inherit;cursor:pointer}
+.nav.active{background:#1F6F6B;color:#fff;font-weight:700}.sair{margin-top:auto}
+.main{flex:1;min-width:0;padding:36px 44px;display:flex;flex-direction:column;gap:22px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+h1{margin:0;font-size:28px}.sub{margin:4px 0 0;color:#5B6B66;font-size:15px}
+.btn,.btn2{display:inline-flex;align-items:center;border-radius:8px;padding:0 20px;min-height:44px;font-size:15px;font-weight:700;font-family:inherit;text-decoration:none;cursor:pointer}
+.btn{background:#1F6F6B;color:#fff;border:0}.btn2{background:#fff;color:#1F2A33;border:1px solid #B9C5C0}
+.btn:disabled{opacity:.6}.btn:focus-visible,.btn2:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.nav:focus-visible{outline:3px solid #7FB8B3;outline-offset:2px}
+.card{background:#fff;border:1px solid #DDE4E0;border-radius:12px;padding:20px}
+.form{display:flex;flex-direction:column;gap:18px;max-width:720px}
+.row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;flex:1;min-width:160px}
+.check{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:600;min-height:44px;flex:1;min-width:200px}
+input,select,textarea{min-height:44px;border:1px solid #B9C5C0;border-radius:8px;padding:0 12px;font-size:15px;font-family:inherit;background:#fff;color:#1F2A33}
+input[type=checkbox]{min-height:0;width:20px;height:20px}
+textarea{padding:10px 12px;min-height:90px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-size:13px;color:#5B6B66;padding:10px 12px;border-bottom:1px solid #DDE4E0}
+td{padding:14px 12px;border-bottom:1px solid #EEF1EF}
+.tag{padding:4px 10px;border-radius:99px;font-size:13px;font-weight:700}
+.t1{background:#DCEBFA;color:#17407A}.t2{background:#FBEBC8;color:#6B4700}.t3{background:#F7DDE3;color:#7A1F36}
+.note{font-size:13px;color:#5B6B66}.erro{color:#9B1C1C;font-size:14px;font-weight:600;margin:0}
+.anexo{border:2px dashed #B9C5C0;border-radius:10px;padding:22px;text-align:center;color:#5B6B66;font-size:15px}
+.login{min-height:100vh;display:grid;place-items:center;background:#F6F7F4;font-family:"Nunito Sans",system-ui,sans-serif;padding:16px}
+.login .card{width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px}
+@media (max-width:760px){.app{flex-direction:column}.side{width:auto;flex-direction:row;flex-wrap:wrap;align-items:center}.school{display:none}.sair{margin:0 0 0 auto}.main{padding:20px}}
+@media print{.side,.noprint{display:none}.app{display:block}.main{padding:0}}

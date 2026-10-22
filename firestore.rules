@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Só usa o sistema quem tem um documento em "usuarios/{uid}" (criado à mão pela direção no console).
+    function autorizado() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid));
+    }
+    match /usuarios/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /lancamentos/{id} {
+      allow read, write: if autorizado();
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
