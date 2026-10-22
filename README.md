@@ -39,38 +39,6 @@ Atestados médicos são dados sensíveis, e por isso o sistema segue estes princ
 - Firebase Authentication e Cloud Firestore (plano gratuito)
 - GitHub Pages para publicação
 
-## Como rodar localmente
-
-Requisitos: Node.js 20 ou mais novo.
-
-```bash
-npm install
-npm run dev
-```
-
-Crie um arquivo `.env` na raiz do projeto com as chaves do app web do Firebase (Configurações do projeto no console do Firebase):
-
-```
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_APP_ID=
-```
-
-Para usar o sistema, é preciso:
-
-1. Ativar **Authentication** com o provedor e-mail/senha e criar os usuários.
-2. Criar o banco **Firestore** (região `southamerica-east1`) e publicar as regras do arquivo `firestore.rules`.
-3. Liberar cada usuário criando um documento em `usuarios/{UID do usuário}`.
-
-## Modelo de dados
-
-- `lancamentos/{id}`: `professorNome`, `tipo` (abono, tre ou atestado), `dataInicio`, `dataFim`, `observacao`, `documentoEntregue`, `protocolo`, `anexo` (reservado), `criadoEm`, `criadoPor`.
-- `usuarios/{uid}`: libera o acesso ao sistema.
-
-## Metodologia
-
-O projeto combina Pesquisa-Ação, com a participação da direção da escola em todas as etapas, e desenvolvimento ágil: o protótipo é apresentado à direção, validado e ajustado ao longo do semestre. Ao final, a escola recebe o sistema em funcionamento, um manual de uso simples e o código aberto neste repositório, para que o projeto possa ser mantido e continuado.
 
 ## Equipe
 
