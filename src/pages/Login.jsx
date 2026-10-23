@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebase'
 
-export default function Login() {
+export default function Login({ aviso }) {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
@@ -28,7 +28,7 @@ export default function Login() {
         <label className="f">Senha
           <input type="password" value={senha} onChange={e => setSenha(e.target.value)} required />
         </label>
-        {erro && <p className="erro">{erro}</p>}
+        {(erro || aviso) && <p className="erro">{erro || aviso}</p>}
         <button className="btn">Entrar</button>
       </form>
     </div>
