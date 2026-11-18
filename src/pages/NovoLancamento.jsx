@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
-import { TIPOS } from '../util'
+import { mensagemDeErro } from '../contas'
+import { TIPOS, comLimiteDeTempo } from '../util'
 
 export default function NovoLancamento() {
   const nav = useNavigate()
+  // ID fixo desde a abertura do formulário: tentar salvar de novo não duplica o lançamento.
+  const [ref] = useState(() => doc(collection(db, 'lancamentos')))
   const [f, setF] = useState({ professorNome: '', tipo: 'abono', dataInicio: '', dataFim: '', observacao: '', documentoEntregue: false, protocolo: '' })
   const [erro, setErro] = useState('')
   const [salvando, setSalvando] = useState(false)
@@ -16,16 +19,22 @@ export default function NovoLancamento() {
     if (f.dataFim && f.dataFim < f.dataInicio) return setErro('A data final não pode ser anterior à data inicial.')
     setErro(''); setSalvando(true)
     try {
-      await addDoc(collection(db, 'lancamentos'), {
+      // Sem resposta do servidor, o Firestore espera para sempre: limita a espera e avisa.
+      await comLimiteDeTempo(setDoc(ref, {
         ...f,
         professorNome: f.professorNome.trim(),
+        protocolo: f.protocolo.trim(),
+        observacao: f.observacao.trim(),
         anexo: null, // reservado: será preenchido quando o armazenamento de anexos for definido
         criadoEm: serverTimestamp(),
         criadoPor: auth.currentUser.uid,
-      })
+      }), 20000)
       nav('/')
-    } catch {
-      setErro('Não foi possível salvar. Tente novamente.'); setSalvando(false)
+    } catch (e) {
+      setErro(e?.code === 'tempo-esgotado'
+        ? 'O servidor não confirmou o salvamento. Verifique a internet e clique em Salvar de novo (o lançamento não será duplicado).'
+        : mensagemDeErro(e))
+      setSalvando(false)
     }
   }
 

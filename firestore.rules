@@ -1,18 +1,78 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Só usa o sistema quem tem um documento em "usuarios/{uid}" (criado à mão pela direção no console).
-    function autorizado() {
-      return request.auth != null
-        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid));
+
+    function logado() {
+      return request.auth != null;
     }
+    function caminhoUsuario(uid) {
+      return /databases/$(database)/documents/usuarios/$(uid);
+    }
+    function caminhoAdmin() {
+      return /databases/$(database)/documents/config/admin;
+    }
+    function perfil() {
+      return get(caminhoUsuario(request.auth.uid)).data;
+    }
+    // Perfis antigos, criados à mão no console sem "status", continuam valendo como aprovados.
+    function aprovado() {
+      return logado()
+        && exists(caminhoUsuario(request.auth.uid))
+        && perfil().get('status', 'aprovado') == 'aprovado';
+    }
+    function admin() {
+      return aprovado() && perfil().get('papel', 'membro') == 'admin';
+    }
+
+    // Marca quem é o primeiro administrador. Criado uma única vez, junto com o perfil dele.
+    match /config/admin {
+      allow read: if logado();
+      allow create: if logado()
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(caminhoUsuario(request.auth.uid)).data.papel == 'admin';
+      allow update, delete: if false;
+    }
+
+    // Perfil de cada conta. O próprio usuário cria o seu ao se cadastrar:
+    // - o primeiro cadastro do sistema vira administrador aprovado;
+    // - os demais ficam pendentes até um administrador aprovar.
     match /usuarios/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
+      allow read: if logado() && (request.auth.uid == uid || admin());
+
+      allow create: if logado()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nome', 'email', 'papel', 'status', 'criadoEm'])
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() > 0
+        && request.resource.data.nome.size() <= 100
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.criadoEm == request.time
+        && (
+          (request.resource.data.papel == 'membro' && request.resource.data.status == 'pendente')
+          || (request.resource.data.papel == 'admin' && request.resource.data.status == 'aprovado'
+              && !exists(caminhoAdmin())
+              && getAfter(caminhoAdmin()).data.uid == uid)
+        );
+
+      // Só administradores mudam status e papel, e nunca o próprio (evita se trancar fora).
+      allow update: if admin()
+        && uid != request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'papel', 'atualizadoEm', 'atualizadoPor'])
+        && request.resource.data.get('status', 'aprovado') in ['pendente', 'aprovado', 'recusado']
+        && request.resource.data.get('papel', 'membro') in ['membro', 'admin']
+        && request.resource.data.get('atualizadoPor', request.auth.uid) == request.auth.uid;
+
+      allow delete: if false;
     }
+
     match /lancamentos/{id} {
-      allow read, write: if autorizado();
+      allow read: if aprovado();
+      allow create: if aprovado() && request.resource.data.criadoPor == request.auth.uid;
+      allow update, delete: if aprovado();
     }
+
     match /{document=**} {
       allow read, write: if false;
     }
